@@ -3,7 +3,7 @@ import json
 import fnmatch
 import argparse
 import numpy as np
-import config_cross_ref1 as config_cross_ref
+import config_cross_ref2 as config_cross_ref
 import utils_datagen as utilsDatagen
 
 # Fking hack to use the BatchGenerator from rnn-model-many2one
@@ -93,8 +93,8 @@ with open(config_cross_ref.minmax_dir) as f:
     min_max_feature = (np.array(min_max_feature_list[0]),np.array(min_max_feature_list[1]))
 
 # Initialize the normalization function
-norm_fn = utilsDatagen.normalize(2, min_max_feature)
-denorm_fn = utilsDatagen.denormalize(min_max_feature)
+norm_fn = utilsDatagen.normalize(3)
+denorm_fn = utilsDatagen.denormalize(3)
 
 # Initialize data generator for prediction
 data_generators = {}

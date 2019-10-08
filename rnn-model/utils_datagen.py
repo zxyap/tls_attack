@@ -10,6 +10,11 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 import utils_metric as utilsMetric
 
+import os
+import sys
+sys.path.append(os.path.join('..', 'rnn-model-many2one'))
+import utils_many2one as utilsMany2one
+
 def find_lines(data):
     for i, char in enumerate(data):
         if char == b'\n':
@@ -57,11 +62,12 @@ def split_train_test(dataset_size, split_ratio, seed):
         train_idx = train_idx[:-1]
     return train_idx, test_idx
 
-def normalize(option, min_max_feature=None):
+def normalize(option):
     def l2_norm(batch_data):
         l2_norm = np.linalg.norm(batch_data, axis=2, keepdims=True)
         batch_data = np.divide(batch_data, l2_norm, out=np.zeros_like(batch_data), where=l2_norm!=0.0)
         return batch_data
+
     def min_max_norm(batch_data, min_max_feature):
         min_feature, max_feature = min_max_feature
         # Dimension 20~62 of ciphersuite are frequency values and should not be normalized like other features
@@ -74,22 +80,39 @@ def normalize(option, min_max_feature=None):
         batch_data[batch_data>1] = 1  # if > max, set to 1
         assert (batch_data <= 1).all() and (batch_data >= 0).all()
         return batch_data
+
+    def reciprocal_norm(batch_data):
+        batch_data[batch_data < 0] = 0  # Set -ve values to 0 because -ve values are mapped weirdly for this func
+        batch_data = batch_data/(1+batch_data)
+        return batch_data
+
     if option == 1:
         return l2_norm
     elif option == 2:
-        if min_max_feature is not None:
-            return partial(min_max_norm, min_max_feature=min_max_feature)
-        else:
-            print("Error: min-max range for feature is not provided")
-            return
+        return min_max_norm
+    elif option == 3:
+        return reciprocal_norm
+    else:
+        print('Error: Option is not valid')
+        return
 
-def denormalize(min_max_feature):
-    # TODO: Denormalize the data based on a user-specified option in future
-    def min_max_denorm(batch_norm_data):
+def denormalize(option):
+    def min_max_denorm(batch_norm_data, min_max_feature):
         min_feature, max_feature = min_max_feature
         batch_data = (batch_norm_data * (max_feature - min_feature)) + min_feature
         return batch_data
-    return min_max_denorm
+
+    def reciprocal_denorm(batch_norm_data):
+        batch_data = batch_norm_data/(1-batch_norm_data)
+        return batch_data
+
+    if option == 2:
+        return min_max_denorm
+    elif option == 3:
+        return reciprocal_denorm
+    else:
+        print('Error: Option is not valid')
+        return
 
 def get_feature_vector(selected_idx, mmap_data, byte_offset, sequence_len, norm_fn):
     selected_byte_offset = [byte_offset[i] for i in selected_idx]
@@ -114,6 +137,31 @@ def preprocess_data(batch_data, pad_len, norm_fn):
     batch_targets = batch_data[:,1:,:]
 
     return batch_inputs, batch_targets
+
+# TODO: Combine rnn-model and rnn-model-many2one module since they share alot of functions
+class SpecialBatchGenerator(utilsMany2one.BatchGenerator):
+    def __init__(self, feature_mmap_byteoffsets, feature_idxs, norm_fn, pos_label):
+        super().__init__(feature_mmap_byteoffsets, feature_idxs, norm_fn, return_batch_info=False)
+        self.pos_label = pos_label
+
+    def __len__(self):
+        return super().__len__()
+
+    def __getitem__(self, idx):
+        batch_data, batch_labels = super().__getitem__(idx)
+
+        # Process batch inputs to generate batch targets
+        packet_zero = np.zeros((batch_data.shape[0], 1, batch_data.shape[2]))
+        batch_data = np.concatenate((packet_zero, batch_data), axis=1)
+        batch_inputs = batch_data[:,:-1,:]
+        batch_targets = batch_data[:,1:,:]
+
+        # Transform 5-vector batch label into a boolean and append to batch_targets
+        packet_labelid = np.zeros((batch_targets.shape[0], 1, batch_targets.shape[2]))
+        packet_labelid[batch_labels[:,self.pos_label]==1,:,:] = 1
+        batch_targets = np.concatenate((packet_labelid, batch_targets), axis=1)
+
+        return (batch_inputs, batch_targets)
 
 class BatchGenerator(Sequence):
     def __init__(self, mmap_data, byte_offset, selected_idx, batch_size, sequence_len, norm_fn, return_batch_info=False):

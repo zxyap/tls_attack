@@ -107,8 +107,8 @@ except FileNotFoundError:
 # Split the dataset into train and test and return train/test indexes to the byte offset
 train_idx,test_idx = utilsDatagen.split_train_test(dataset_size=len(byte_offset), split_ratio=SPLIT_RATIO, seed=SEED)
 # Initialize the normalization function
-norm_fn = utilsDatagen.normalize(2, min_max_feature)
-denorm_fn = utilsDatagen.denormalize(min_max_feature)
+norm_fn = utilsDatagen.normalize(3)
+denorm_fn = utilsDatagen.denormalize(3)
 # Initialize the batch generator
 train_generator = partial(utilsDatagen.BatchGenerator, mmap_data=mmap_data,byte_offset=byte_offset,selected_idx=train_idx,
                                                         batch_size=BATCH_SIZE, sequence_len=SEQUENCE_LEN, norm_fn=norm_fn,
@@ -245,11 +245,22 @@ def evaluate_model_on_generator(model, dataset_generator, featureinfo_dir, pcapn
         for x in sorted_acc:
             f.write(str(x)+'\n')
 
-dataset_name = ['train', 'val']
-dataset_generator = [train_generator, test_generator]
-for i in range(len(dataset_name)):
-    print('\n##################################################')
-    print('Evaluating model on {} dataset'.format(dataset_name[i]))
-    evaluate_model_on_generator(model, dataset_generator[i], featureinfo_dir, pcapname_dir, os.path.join(save_dir, dataset_name[i]))
+# Evaluate on train set
+print('\n##################################################')
+if len(train_idx)>0:
+    print('Evaluating model on {} dataset'.format('train'))
+    evaluate_model_on_generator(model, train_generator, featureinfo_dir, pcapname_dir, os.path.join(save_dir, 'train'))
+else:
+    print('Warning: Not enough data points in train set for evaluation. Skipping.')
+    os.makedirs(os.path.join(save_dir, 'train'))
+
+# Evaluate on test set
+print('\n##################################################')
+if len(test_idx)>0:
+    print('Evaluating model on {} dataset'.format('val'))
+    evaluate_model_on_generator(model, test_generator, featureinfo_dir, pcapname_dir, os.path.join(save_dir, 'val'))
+else:
+    print('Warning: Not enough data points in train set for evaluation. Skipping.')
+    os.makedirs(os.path.join(save_dir, 'train'))
 
 print('\nModel Evaluation Completed!')
