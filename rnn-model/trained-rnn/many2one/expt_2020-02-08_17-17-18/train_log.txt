@@ -1,0 +1,52 @@
+####################################
+Training Start Date: 2020-02-08
+Training Start Time: 17-17-18
+Batch Size: 2
+Epoch: 7
+Feature files used: normal,breach,poodle,rc4,dos
+Existing model used: None
+Split Ratio: 0.2
+Seed: 2019
+####################################
+
+Model: "sequential"
+
+_________________________________________________________________
+
+Layer (type)                 Output Shape              Param #   
+
+=================================================================
+
+cu_dnnlstm (CuDNNLSTM)       (None, 147)               174048    
+
+_________________________________________________________________
+
+dense (Dense)                (None, 5)                 740       
+
+=================================================================
+
+Total params: 174,788
+
+Trainable params: 174,788
+
+Non-trainable params: 0
+
+_________________________________________________________________
+
+#####  TRAIN/VAL LOSS  #####
+Epoch  #1	Train Loss: 0.161462	Val Loss: 0.001506
+Epoch  #2	Train Loss: 0.002407	Val Loss: 0.000460
+Epoch  #3	Train Loss: 0.002775	Val Loss: 0.000025
+Epoch  #4	Train Loss: 0.001938	Val Loss: 0.006242
+Epoch  #5	Train Loss: 0.002495	Val Loss: 0.003120
+Epoch  #6	Train Loss: 0.003279	Val Loss: 0.000039
+Epoch  #7	Train Loss: 0.002980	Val Loss: 0.000131
+
+#####  TRAIN/VAL ACCURACY  #####
+Epoch  #1	Train Mean Accuracy: 0.938392	Val Mean Accuracy: 0.999806
+Epoch  #2	Train Mean Accuracy: 0.999589	Val Mean Accuracy: 0.999903
+Epoch  #3	Train Mean Accuracy: 0.999710	Val Mean Accuracy: 1.000000
+Epoch  #4	Train Mean Accuracy: 0.999637	Val Mean Accuracy: 0.994000
+Epoch  #5	Train Mean Accuracy: 0.999661	Val Mean Accuracy: 0.999806
+Epoch  #6	Train Mean Accuracy: 0.999686	Val Mean Accuracy: 1.000000
+Epoch  #7	Train Mean Accuracy: 0.999516	Val Mean Accuracy: 0.999903

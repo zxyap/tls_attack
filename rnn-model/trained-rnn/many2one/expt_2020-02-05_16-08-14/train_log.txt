@@ -1,0 +1,62 @@
+####################################
+Training Start Date: 2020-02-05
+Training Start Time: 16-08-14
+Batch Size: 2
+Epoch: 10
+Feature files used: normal,breach,poodle,rc4,dos
+Existing model used: None
+Split Ratio: 0.2
+Seed: 2019
+####################################
+
+Model: "sequential"
+
+_________________________________________________________________
+
+Layer (type)                 Output Shape              Param #   
+
+=================================================================
+
+cu_dnnlstm (CuDNNLSTM)       (None, 147)               174048    
+
+_________________________________________________________________
+
+dense (Dense)                (None, 5)                 740       
+
+_________________________________________________________________
+
+activation (Activation)      (None, 5)                 0         
+
+=================================================================
+
+Total params: 174,788
+
+Trainable params: 174,788
+
+Non-trainable params: 0
+
+_________________________________________________________________
+
+#####  TRAIN/VAL LOSS  #####
+Epoch  #1	Train Loss: 0.876775	Val Loss: 0.580799
+Epoch  #2	Train Loss: 0.696563	Val Loss: 0.845825
+Epoch  #3	Train Loss: 0.711751	Val Loss: 0.561691
+Epoch  #4	Train Loss: 0.542973	Val Loss: 0.541204
+Epoch  #5	Train Loss: 0.592229	Val Loss: 0.540948
+Epoch  #6	Train Loss: 0.543495	Val Loss: 0.540957
+Epoch  #7	Train Loss: 0.543353	Val Loss: 0.540954
+Epoch  #8	Train Loss: 0.541330	Val Loss: 0.541761
+Epoch  #9	Train Loss: 0.542396	Val Loss: 0.542386
+Epoch  #10	Train Loss: 0.542971	Val Loss: 0.540947
+
+#####  TRAIN/VAL ACCURACY  #####
+Epoch  #1	Train Mean Accuracy: 0.626627	Val Mean Accuracy: 0.778014
+Epoch  #2	Train Mean Accuracy: 0.711044	Val Mean Accuracy: 0.585156
+Epoch  #3	Train Mean Accuracy: 0.697426	Val Mean Accuracy: 0.792336
+Epoch  #4	Train Mean Accuracy: 0.805428	Val Mean Accuracy: 0.806174
+Epoch  #5	Train Mean Accuracy: 0.770717	Val Mean Accuracy: 0.806271
+Epoch  #6	Train Mean Accuracy: 0.805307	Val Mean Accuracy: 0.806271
+Epoch  #7	Train Mean Accuracy: 0.805380	Val Mean Accuracy: 0.806271
+Epoch  #8	Train Mean Accuracy: 0.806081	Val Mean Accuracy: 0.805980
+Epoch  #9	Train Mean Accuracy: 0.805912	Val Mean Accuracy: 0.805690
+Epoch  #10	Train Mean Accuracy: 0.805404	Val Mean Accuracy: 0.806271
